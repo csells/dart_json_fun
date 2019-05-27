@@ -1,14 +1,32 @@
 // from https://flutter.dev/docs/development/data-and-backend/json#manual-encoding
+// and from https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
 import 'dart:convert';
+
+// TODO:
+// -does the toJson/fromJson naming really matter?
+//  it's certainly misleading, since JSON is a string format, not a Map<String, dynamic>.
+// -what if the JSON has more than it should? are the extras ignored?
+// -what if the JSON has less than it should? are the fields nulled?
 
 // container of a custom collection type
 // needs to use the toJson/fromJson directly
 class Family {
-  String name;
-  People people;
+  String _name;
+  People _people;
 
-  Family(this.name, this.people);
-  Family.fromJson(Map<String, dynamic> json) : this(json['name'], People.fromJson(json['people']));
+  String get name => _name;
+  set name(String name) => _name = name;
+
+  People get people => _people;
+  set people(People people) => _people = people;
+
+  Family({String name = null, People people = null}) {
+    _name = name;
+    _people = people;
+  }
+
+  Family.fromJson(Map<String, dynamic> json)
+      : this(name: json['name'], people: People.fromJson(json['people']));
   Map<String, dynamic> toJson() => {'name': name, 'people': people.toJson()};
   String toString() => "$name Family: $people";
 }
@@ -19,8 +37,13 @@ class Family {
 class People {
   List<Person> _items;
 
+  void add(Person person) => _items.add(person);
+  void remove(Person person) => _items.remove(person);
+  Iterable<Person> get items => _items;
+
   People(this._items);
-  People.fromJson(List<dynamic> json) : this(json.map((i) => Person.fromJson(i)).toList());
+  People.fromJson(List<dynamic> json)
+      : this(List<Person>.from(json.map((i) => Person.fromJson(i)).toList()));
   List<dynamic> toJson() => _items.map((i) => i.toJson()).toList();
   String toString() => 'People: ${_items.toString()}';
 }
@@ -28,11 +51,21 @@ class People {
 // simple type
 // can be simple
 class Person {
-  String name;
-  int age;
+  String _name;
+  int _age;
 
-  Person(this.name, this.age);
-  Person.fromJson(Map<String, dynamic> json) : this(json['name'], json['age']);
+  String get name => _name;
+  set name(String name) => _name = name;
+
+  int get age => _age;
+  set age(int age) => _age = age;
+
+  Person({String name = null, int age = 0}) {
+    _name = name;
+    _age = age;
+  }
+
+  Person.fromJson(Map<String, dynamic> json) : this(name: json['name'], age: json['age']);
   Map<String, dynamic> toJson() => {'name': name, 'age': age};
   String toString() => '$name is $age years old';
 }
@@ -46,7 +79,7 @@ void dump(String label, Object o, {String expect = null}) {
 main() {
   print('\nPerson test:');
   {
-    Person john = Person('John', 25);
+    Person john = Person(name: 'John', age: 25);
     dump('john', john, expect: 'Person john = John is 25 years old');
     Map<String, dynamic> map = john.toJson();
     dump('map', map, expect: '_InternalLinkedHashMap<String, dynamic> map = {name: John, age: 25}');
@@ -63,7 +96,7 @@ main() {
 
   print('\nPeople test:');
   {
-    People boys = People([Person("John", 25), Person("Tom", 23)]);
+    People boys = People([Person(name: "John", age: 25), Person(name: "Tom", age: 23)]);
     dump('boys', boys, expect: 'People boys = People: [John is 25 years old, Tom is 23 years old]');
     List<dynamic> list = boys.toJson();
     dump('list', list,
@@ -80,7 +113,12 @@ main() {
 
   print('\nFamily test:');
   {
-    Family fam = Family("Sells", People([Person("John", 25), Person("Tom", 22)]));
+    Family fam = Family(
+      name: "Sells",
+      people: People(
+        [Person(name: "John", age: 25), Person(name: "Tom", age: 22)],
+      ),
+    );
     dump("fam", fam, expect: 'Sells Family: People: [John is 25 years old, Tom is 22 years old]');
     Map<String, dynamic> map = fam.toJson();
     dump('map', map,
