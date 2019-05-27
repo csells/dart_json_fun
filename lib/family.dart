@@ -1,11 +1,7 @@
 // from https://flutter.dev/docs/development/data-and-backend/json#manual-encoding
 // and from https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
-import 'dart:collection';
-import 'dart:convert';
 
 // TODO:
-// -does the toJson/fromJson naming really matter?
-//  it's certainly misleading, since JSON is a string format, not a Map<String, dynamic>.
 // -what if the JSON has more than it should? are the extras ignored?
 // -what if the JSON has less than it should? are the fields nulled?
 
