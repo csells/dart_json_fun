@@ -1,9 +1,6 @@
 // from https://flutter.dev/docs/development/data-and-backend/json#manual-encoding
 // and from https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
-
-// TODO:
-// -what if the JSON has more than it should? are the extras ignored?
-// -what if the JSON has less than it should? are the fields nulled?
+// and some of my own stuff, too
 
 // container of a custom collection type
 // needs to use the toJson/fromJson directly
@@ -35,8 +32,10 @@ class People {
 
   People(this._items);
   People.fromJson(List<dynamic> json)
-      : this(List<Person>.from(json.map((i) => Person.fromJson(i)).toList()));
-  List<dynamic> toJson() => _items.map((i) => i.toJson()).toList();
+      : this(json == null
+            ? List<Person>()
+            : List<Person>.from(json.map((i) => Person.fromJson(i)).toList()));
+  List<dynamic> toJson() => _items == null ? null : _items.map((i) => i.toJson()).toList();
   String toString() => 'People: ${_items.toString()}';
 }
 

@@ -74,4 +74,51 @@ void main() {
     expect(dump('fam3', fam3),
         'Family fam3 = Sells Family: People: [John is 25 years old, Tom is 22 years old]');
   });
+
+  test('Person w/ missing fields', () {
+    var json = '{"name":"John"}';
+    var john = Person.fromJson(jsonDecode(json));
+    expect(john.name, 'John');
+    expect(john.age, null);
+  });
+
+  test('Person w/ extra fields', () {
+    var json = '{"name": "John", "age": 25, "eyes": "blue"}';
+    var john = Person.fromJson(jsonDecode(json));
+    expect(john.name, 'John');
+    expect(john.age, 25);
+  });
+
+  test('Empty People', () {
+    var json1 = '[]';
+    var people = People.fromJson(jsonDecode(json1));
+
+    var json2 = jsonEncode(people);
+    expect(json2, json1);
+
+    people.add(Person('Tom', 23));
+    expect(people.items.first.name, 'Tom');
+  });
+
+  test('Family w/ empty People (1)', () {
+    var json1 = '{"name": "Sells", "people": []}';
+    var fam = Family.fromJson(jsonDecode(json1));
+
+    var json2 = jsonEncode(fam);
+    expect(json2, '{"name":"Sells","people":[]}');
+
+    fam.people.add(Person('Tom', 23));
+    expect(fam.people.items.first.name, 'Tom');
+  });
+
+  test('Family w/ empty People (2)', () {
+    var json1 = '{"name": "Sells"}';
+    var fam = Family.fromJson(jsonDecode(json1));
+
+    var json2 = jsonEncode(fam);
+    expect(json2, '{"name":"Sells","people":[]}');
+
+    fam.people.add(Person('Tom', 23));
+    expect(fam.people.items.first.name, 'Tom');
+  });
 }
