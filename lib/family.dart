@@ -2,6 +2,8 @@
 // and from https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
 // and some of my own stuff, too
 
+import 'dart:collection';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'family.g.dart';
@@ -11,19 +13,22 @@ part 'family.g.dart';
 @JsonSerializable()
 class Family {
   String _name;
-  People _people;
+  final People _people;
 
   String get name => _name;
 
   set name(String name) => _name = name;
 
-  People get people => _people;
+  List<Person> get people => _people;
 
-  set people(People people) => _people = people;
+  set people(List<Person> people) {
+    _people.clear();
+    _people.addAll(people);
+  }
 
-  Family(String name, People people)
+  Family(String name, List<Person> people)
       : _name = name,
-        _people = people;
+        _people = People(people);
 
   factory Family.fromJson(Map<String, dynamic> json) => _$FamilyFromJson(json);
 
@@ -35,26 +40,23 @@ class Family {
 // custom collection type
 // reads and writes itself as a List<dynamic> so that it can appear correctly in the JSON,
 // since jsonEncode/jsonDecode map '[...]' <=> List<Dynamic>
-class People {
-  List<Person> _items;
-
-  void add(Person person) => _items.add(person);
-
-  void remove(Person person) => _items.remove(person);
-
-  Iterable<Person> get items => _items;
+class People extends ListBase<Person> {
+  final List<Person> _items;
 
   People(List<Person> items) : _items = items;
 
-  People.fromJson(List<dynamic> json)
-      : this(json == null
-            ? List<Person>()
-            : List<Person>.from(json.map((i) => Person.fromJson(i)).toList()));
-
-  List<dynamic> toJson() =>
-      _items == null ? null : _items.map((i) => i.toJson()).toList();
-
   String toString() => 'People: ${_items.toString()}';
+
+  @override
+  int get length => _items.length;
+
+  set length(int value) => _items.length = value;
+
+  @override
+  Person operator [](int index) => _items[index];
+
+  @override
+  void operator []=(int index, Person value) => _items[index] = value;
 }
 
 // simple type

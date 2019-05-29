@@ -7,8 +7,12 @@ part of 'family.dart';
 // **************************************************************************
 
 Family _$FamilyFromJson(Map<String, dynamic> json) {
-  return Family(json['name'] as String,
-      json['people'] == null ? null : People.fromJson(json['people'] as List));
+  return Family(
+      json['name'] as String,
+      (json['people'] as List)
+          ?.map((e) =>
+              e == null ? null : Person.fromJson(e as Map<String, dynamic>))
+          ?.toList());
 }
 
 Map<String, dynamic> _$FamilyToJson(Family instance) =>
